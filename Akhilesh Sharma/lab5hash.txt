@@ -1,0 +1,134 @@
+#include<stdio.h>
+#include<conio.h>
+#include<stdlib.h>
+#include<string.h>
+int hash_table[10];
+int hash_fun();
+void pass_fun();
+void login();
+struct User
+{
+	int user_id;
+	char password[50];
+}pswd[10];
+int main()
+{
+	int choice;
+	while(1)
+	{
+	
+		printf("Enter -> 1  For new user.\n");
+		printf("Enter -> 2  For login.\n");
+		printf("Enter -> 3  For EXIT.\n");
+		scanf("%d",&choice);
+		printf("\n");
+		switch(choice)
+		{
+			case 1:
+				pass_fun();
+				break;
+			case 2:
+				login();
+				break;
+			case 3:
+				exit(1);
+				break;
+			default :
+				printf("wrong choice.\n");
+				break;
+		}
+	}
+	return 0;
+}
+void pass_fun()
+{ 
+	int userid;
+	int index;
+	char pass[50];
+	int small,caps,n,special,i;
+	small=0; caps=0; n=0; special=0;
+	int length;
+	printf("Enter user ID.\n");
+	scanf("%d",&userid);
+	index=hash_fun(userid);
+	//printf("sabvhdfgbs");
+	
+	while(1)
+	{
+		printf("Enter password\n");
+		scanf("%s",pass);
+		length=strlen(pass);
+		if(length<6)
+		{
+			printf("password is weak\n");
+			continue;
+		}
+		else
+		{
+			for(i=0;i<length;i++)
+			{
+				if(pass[i]>='a' && pass[i]<='z')
+					small++;
+				if(pass[i]>='A' && pass[i]<='Z')
+					caps++;
+				if(pass[i]>='0' && pass[i]<='9')
+					n++;
+				if(((pass[i]>=27) && (pass[i]<=47))||((pass[i]>=58) && (pass[i]<=64)) || ((pass[i]>=91) && (pass[i]<=96)) || ((pass[i]>=123) && (pass[i]<=126)))
+					special++;
+			}
+			if((small!=0) && (caps==0) && (n==0) && (special==0))
+			{
+				printf("password is medium\nEnter another\n");
+				continue;
+			}
+			else if(small!=0 && caps==0 && n!=0 && special==0)
+			{
+				printf("password is average\nEnter another\n");
+				continue;
+			}
+			else if(small!=0 && caps!=0 && n!=0 && special==0)
+			{
+				printf("password is strong\nEnter another\n");
+				continue;
+			}
+			else if(small!=0 && caps!=0 && n!=0 && special!=0)
+			{
+				printf("password is very strong\n");
+				pswd[index].user_id=userid;
+				strcpy(pswd[index].password,pass);
+				printf("saved successfully\n");
+				break;
+			}
+			else
+			{
+				printf("password not good\nEnter another\n");
+				continue;
+			}
+		}
+	}
+	
+}
+int hash_fun(int userid)
+{
+	int i;
+	i=userid%7;
+	return i;
+}
+void login()
+{
+	int user_id;
+	char password[50];
+	printf("Enter valid user id:->\n");
+	scanf("%d",&user_id);
+	int index=hash_fun(user_id);
+	printf("Enter password:->\n");
+	scanf("%s",password);
+	if(strcmp(pswd[index].password,password)==0)
+	{
+		printf("...........login Successfully............\n");
+	}
+	else
+	{
+		printf("password is wrong.\n");
+	}
+}

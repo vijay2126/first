@@ -1,0 +1,143 @@
+#include<stdio.h>
+#include<conio.h>
+#include<string.h>
+#include<stdlib.h>
+void insert(FILE *fp);
+void del(FILE *fp);
+void display(FILE *fp);
+int search(FILE *fp,char *sub);
+struct 
+{
+	char subject[100];
+	int video_id;
+	char topic[100];
+	char url[100];
+	int duration;
+	
+}video;
+/* main function started */
+int main(void)
+{
+	int choice;
+	FILE *fp;
+	fp=fopen("videos","rb+");
+	if(fp==NULL)
+	{
+		fp=fopen("videos","wb+");
+		if(fp==NULL)
+		{
+			puts("error in opening file");
+			exit(1);	
+		}
+	}
+	while(1)
+	{
+		printf("\n1.   for insert\n");
+		printf("2.   for delete subject data\n");
+		printf("3.   for display subject data\n");
+		printf("4.   for exit from program\n");
+		printf("Enter your choice\n");
+		scanf("%d",&choice);
+		switch(choice)
+		{
+			case 1:
+				insert(fp);
+				break;
+			case 2:
+				del(fp);
+				break;
+			case 3:
+				display(fp);
+				break;
+			case 4:
+				fclose(fp);
+				exit(1);
+			default:
+				printf("\nWrong choice\n");
+				
+		}
+	}
+	return 0;
+} /* end of main function */
+
+
+/*  function for get data of perticular video */
+void insert(FILE *fp)
+{
+	fseek(fp,0,2);
+	
+	printf("\nEnter subject name\n");
+	scanf("%s",video.subject);
+	printf("Enter video id\n");
+	scanf("%d",&video.video_id);
+	printf("Enter the topic name\n");
+	scanf("%s",video.topic);
+	printf("Enter url\n");
+	scanf("%s",video.url);
+	printf("Enter Duration\n");
+	scanf("%d",&video.duration);
+	fwrite(&video,sizeof(video),1,fp);
+	printf("\n data will be inserted successfully\n");
+}     /* end of insert function  */
+
+/* function for delete data from file */
+void del(FILE *fp)
+{
+	FILE *ftemp;
+	char tempsub[100];
+	printf("\nEnter the subject name which you want to delete\n");
+	scanf("%s",tempsub);
+	if(search(fp,tempsub)==0)
+	return;
+	ftemp=fopen("tempfile","wb");
+	rewind(fp);
+	while(fread(&video,sizeof(video),1,fp) == 1)
+	{
+		if(strcmp(tempsub,video.subject) != 0)
+		fwrite(&video,sizeof(video),1,ftemp);
+		
+	}
+	fclose(fp);
+	fclose(ftemp);
+	remove("videos");
+	rename("tempfile","videos");
+	printf("\nRecord of video deleted\n\n");
+	fp=fopen("videos","rb+");
+	
+}     /* end of delete function */
+
+
+/* function for display a perticular data */
+void display(FILE *fp)
+{
+	char tempsub[100];
+	printf("\nEnter the subject name\n");
+	scanf("%s",tempsub);
+	if(search(fp,tempsub)==1)
+	{
+		printf("\nvideoid=%d",video.video_id);
+		printf("\ntopic name = %s",video.topic);
+		printf("\nduration of video= %d",video.duration);
+		printf("\nURL for the video = %s\n",video.url);
+		
+	}
+}  /*end of display  */
+
+
+/* function for search perticular data */
+int search(FILE *fp,char *sub)
+{
+	unsigned flag=0;
+	rewind(fp);
+	while(fread(&video, sizeof(video),1,fp) == 1)
+	{
+		if(strcmp(sub,video.subject)==0)
+		{
+			flag=1;
+			break;
+		}
+	}
+	if(flag==0)
+	printf("\nsubject not found\n");
+	return flag;	
+}   /* end of search */
